@@ -1,0 +1,72 @@
+#include <iostream>
+#include <string>
+#include <unordered_set>
+#include <algorithm>
+
+using namespace std;
+
+class PasswordStrengthChecker {
+public:
+    // Function to check the strength of a password
+    string checkStrength(const string& password) {
+        int lengthScore = scoreLength(password);
+        int complexityScore = scoreComplexity(password);
+        int uniquenessScore = scoreUniqueness(password);
+
+        int totalScore = lengthScore + complexityScore + uniquenessScore;
+        
+        return getFeedback(totalScore);
+    }
+
+private:
+    // Score based on length
+    int scoreLength(const string& password) {
+        int length = password.length();
+        if (length >= 12) return 3;
+        if (length >= 8) return 2;
+        if (length >= 5) return 1;
+        return 0;
+    }
+
+    // Score based on complexity
+    int scoreComplexity(const string& password) {
+        bool hasLower = false, hasUpper = false, hasDigit = false, hasSpecial = false;
+        for (char ch : password) {
+            if (islower(ch)) hasLower = true;
+            else if (isupper(ch)) hasUpper = true;
+            else if (isdigit(ch)) hasDigit = true;
+            else hasSpecial = true;
+        }
+
+        int types = hasLower + hasUpper + hasDigit + hasSpecial;
+        return types - 1;
+    }
+
+    // Score based on uniqueness (basic version)
+    int scoreUniqueness(const string& password) {
+        unordered_set<string> commonPasswords = {"password", "123456", "123456789", "qwerty", "abc123"};
+        if (commonPasswords.find(password) != commonPasswords.end()) return 0;
+
+        return 2; // Assume all other passwords are unique enough for basic checking
+    }
+
+    // Feedback based on total score
+    string getFeedback(int score) {
+        if (score >= 7) return "Strong";
+        if (score >= 4) return "Medium";
+        return "Weak";
+    }
+};
+
+int main() {
+    PasswordStrengthChecker checker;
+    string password;
+    
+    cout << "Enter a password to check its strength: ";
+    cin >> password;
+    
+    string strength = checker.checkStrength(password);
+    cout << "Password strength: " << strength << endl;
+    
+    return 0;
+}
